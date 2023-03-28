@@ -1,5 +1,5 @@
 var teamID = 6936;
-var eventID = '2023ohmv'; //should be changed to the most current event
+var eventID = '2022alhu2023ohmv'; //should be changed to the most current event
 const URL = 'https://www.thebluealliance.com/api/v3/team/frc' + teamID + '/event/' + eventID + '/' + 'matches';
 var key = 'GAHGTZ290bRxHnbX13UurGfvEgyUaHukRxK2ktrMg2XCNyvykH1IibGqasL3al9I';
 var matchTimestamps = [];
@@ -22,6 +22,7 @@ var number_wrapper = document.getElementById('number_wrapper');
 var debugMode = false;
 var i = 0;
 var number_wrapper = document.getElementById('number-wrapper');
+Access-Control-Allow-Origin: 'https://www.thebluealliance.com/api/v3/team/frc';
 function activateDebugging() {
   if (debugMode) {
     $("#debug").html("click to activate debug mode");
