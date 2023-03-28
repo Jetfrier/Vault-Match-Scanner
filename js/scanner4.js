@@ -1,5 +1,5 @@
 var teamID = 6936;
-var eventID = '2022alhu'; //should be changed to the most current event
+var eventID = '2023ohmv'; //should be changed to the most current event
 const URL = 'https://www.thebluealliance.com/api/v3/team/frc' + teamID + '/event/' + eventID + '/' + 'matches';
 var key = 'GAHGTZ290bRxHnbX13UurGfvEgyUaHukRxK2ktrMg2XCNyvykH1IibGqasL3al9I';
 var matchTimestamps = [];
