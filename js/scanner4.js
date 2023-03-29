@@ -1,5 +1,5 @@
 var teamID = 6936;
-var eventID = '2022alhu2023ohmv'; //should be changed to the most current event
+var eventID = '2023alhu'; //should be changed to the most current event
 const URL = 'https://www.thebluealliance.com/api/v3/team/frc' + teamID + '/event/' + eventID + '/' + 'matches';
 var key = 'GAHGTZ290bRxHnbX13UurGfvEgyUaHukRxK2ktrMg2XCNyvykH1IibGqasL3al9I';
 var matchTimestamps = [];
@@ -22,7 +22,6 @@ var number_wrapper = document.getElementById('number_wrapper');
 var debugMode = false;
 var i = 0;
 var number_wrapper = document.getElementById('number-wrapper');
-Access-Control-Allow-Origin: 'https://www.thebluealliance.com/api/v3/team/frc';
 function activateDebugging() {
   if (debugMode) {
     $("#debug").html("click to activate debug mode");
@@ -95,7 +94,8 @@ function addMatchNumbers() {
     p.classList.add('current_number');
     p.id = 'p' + i;
     div.appendChild(p);
-    p.setAttribute('style', 'color: ' + color);
+	let tempColor = findMatchColor(i);
+    p.setAttribute('style', 'color: ' + tempColor);
     $('#p'+i).html(data[i].match_number);
     if (i == currentMatchNum) {
       p.setAttribute('style', 'color: #00e600; font-size: 35');
@@ -103,7 +103,75 @@ function addMatchNumbers() {
     numbers.push(true); //it really doesn't matter what gobledygook gets pushed to the list as long as something is
   }
 }
+
+function makeFakeData(){
+	console.debug("No match data found for team " + teamID + " at Event " + eventID);
+	$("#txtCurrentTime").html("Current DEBUG Time");
+	//document.getElementById("next-match"). // setAttribute('style', 'color: black');
+	var line = {
+	"key": "string",
+	"comp_level": "qm",
+	"set_number": 0,
+	"match_number": 0,
+	"alliances": {
+		"red": {
+			"score": 0,
+			"team_keys": [
+				"team1", "team2", "team3" 
+			]
+		},
+		"blue": {
+			"score": 0,
+			"team_keys": [
+				"team1", "team5", "team4" 
+			]
+		}
+	},
+	"event_key": "string",
+	"time": 0,
+	"actual_time": 0,
+	"predicted_time": 0};
+	var testLength = 10;
+	data = Array(testLength);
+	for(i = 0; i < testLength; i++)
+	{
+      data[i] = JSON.parse(JSON.stringify(line)); // Thanks, I hate it.
+	  data[i].actual_time = (now.getTime() / 1000) + 1200 * (i + 1);
+	  data[i].predicted_time = (now.getTime() / 1000) + 1200 * (i + 1);
+	  data[i].match_number = i + 1;
+	  if(i % 2)
+	  {
+		  data[i].alliances.red.team_keys[0] = "frc" + teamID;
+	  }
+	  else
+	  {
+		  data[i].alliances.blue.team_keys[0] = "frc" + teamID;
+	  }
+	}
+	return data;
+}
+
+function findMatchColor(matchNum)
+{
+   if (!(matchNum == null)) {
+    var color = null;
+    for (j = 0; j < 3; j++) {
+      if (data[matchNum].alliances.blue.team_keys[j] == 'frc' + teamID) { 
+        color = '#3470d1';
+      }
+    }
+  }
+  if (color == null) {
+    color = '#d62e2e';
+  }
+  return color;
+}
+
 function logData(data) {
+  if(data.length < 1)
+  {
+	  data = makeFakeData();
+  }
   this.data = data;
   currentMatchNum = null; //Must be reset to null or else it won't find the latest match
   matchTimestamps = []; //Also must be reset
@@ -116,17 +184,7 @@ function logData(data) {
   if (debugMode) {
     currentMatchNum = 3;
   }
-  if (!(currentMatchNum == null)) {
-    color = null;
-    for (i = 0; i < 3; i++) {
-      if (data[currentMatchNum].alliances.blue.team_keys[i] == 'frc' + teamID) { 
-        color = '#3470d1';
-      }
-    }
-  }
-  if (color == null) {
-    color = '#d62e2e';
-  }
+  color = findMatchColor(currentMatchNum);
   if (debugMode || ((!(currentMatchNum == null)) && laterThan(matchTimestamps[currentMatchNum]) && matchTimestamps[currentMatchNum] != null)) { //checking whether there is still a match in the future and if there is data available on it
     $("#current_match").html(readable(matchTimestamps[currentMatchNum]));
     if (!(currentMatchNum+1 > data.length-1)) {
@@ -159,7 +217,7 @@ function logData(data) {
     $("#status").css('background-color', color);
     $('number-wrapper').css('display', 'block');
     $("#time-wrapper").css('left', '0%');
-    $("#time-wrapper").css('transform', 'translate(0%, -55%)');
+    $("#time-wrapper").css('transform', 'translate(0%, 25%)');
     $("#number-wrapper").css('display', 'block');
     $("#match-wrapper").css('display', 'block');
     $("#remaining_time").css('display', 'block');
@@ -168,19 +226,25 @@ function logData(data) {
   } else {
     $("#number-wrapper").css('display', 'none');
     $("#time-wrapper").css('left', '50%');
-    $("#time-wrapper").css('transform', 'translate(-50%, -55%)');
+    $("#time-wrapper").css('transform', 'translate(-50%, 25%)');
     $("#countdown-wrapper").css('left', '50%');
     $("#countdown-wrapper").css('transform', 'translateX(-50%)');
     $("#match-wrapper").css('display', 'none');
     $("#remaining_time").css('display', 'none');
     $("#remaining-time-wrapper").css('width', '100%'); 
-    if(data[0].predicted_time != null) { //if that value equals null then TBA doesn't have the necessary data yet
-      $("#next-match").html("Looks like you're all done with matches!");
-      $("#json").html('total matches: ' + data.length + '<br>' + 'no upcoming matches!');
-    } else {
-      $("#next-match").html("Currently, TBA has no info on upcoming matches.  Try again later!");
+	if(data.length < 1)
+	{
+	  $("#next-match").html("Currently, TBA has no info on upcoming matches.  Try again later!");
       $("#json").html("Well...The Blue Alliance doesn't have any information on this tournament at the moment, which probably means the event has not begun yet.  Check back another time!");
-    }   
+	}
+    else if(data[0].predicted_time != null) { //if that value equals null then TBA doesn't have the necessary data yet
+        $("#next-match").html("Looks like you're all done with matches!");
+        $("#json").html('total matches: ' + data.length + '<br>' + 'no upcoming matches!');
+    }
+	else {
+      $("#next-match").html("Currently, TBA has no info on upcoming matches.  Try again later!");
+      $("#json").html("Well...The Blue Alliance doesn't have any information on this tournament at the moment, which probably means the event has not begun yet.  Check back another time!");  
+	}
   } 
   $("#loading").css('top', '-100%'); 
   $("#loadingText").css('opacity', '0%'); 

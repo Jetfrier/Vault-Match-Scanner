@@ -25,7 +25,7 @@
 <div id="time-wrapper">
 <div id="wrapper1">
 <div id="countdown-wrapper">
-<p class="display">current time</p>
+<p id="txtCurrentTime" class="display">current time</p>
 <div id="countdown-box">
 <p id="countdown"></p>
 </div>
@@ -157,13 +157,12 @@ float: left;
 }
 #countdown-box {
 display: inline-block;
-<!-- position: relative; -->
+position: relative;
 width: auto;
 padding-right: 20px;
 padding-left: 20px;
 background-color: white;
 border-radius: 25px;
-top: 50%;
 }
 #countdown {
 display: block;
